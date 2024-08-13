@@ -41,3 +41,41 @@ resource "aws_route_table" "public_route_table" {
     }
   // 해당 코드를 통해서 외부와 통신 하는 라우팅 규칙을 생성.
 }
+
+resource "aws_route_table_association" "route_table_association" {
+    subnet_id = aws_subnet.public_subnet.id
+    route_table_id = aws_route_table.public_route_table.id
+    // 서브넷과 라우팅 테이블을 연결.  
+}
+
+resource "aws_security_group" "test_rule" {
+  name_prefix = "test_rule" // production엔 이름 변경 필요
+  vpc_id = aws_vpc.public_vpc.id
+} // 기본 보안그룹 대신 해당 그룹 사용하도록 설정 해야함
+
+resource "aws_security_group_rule" "test_rule_ssh" {
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.test_rule.id
+}
+
+# resource "aws_security_group_rule" "test_rule_https" {
+#   type        = "ingress"
+#   from_port   = 443
+#   to_port     = 443
+#   protocol    = "tcp"
+#   cidr_blocks = ["0.0.0.0/0"]
+#   security_group_id = aws_security_group.test_rule.id
+# }
+
+resource "aws_security_group_rule" "test_rule_all" {
+  type             = "egress"
+  from_port        = 0
+  to_port          = 0
+  protocol         = "-1"
+  cidr_blocks      = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.test_rule.id
+}
