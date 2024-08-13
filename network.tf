@@ -51,7 +51,7 @@ resource "aws_route_table_association" "route_table_association" {
 resource "aws_security_group" "test_rule" {
   name_prefix = "test_rule" // production엔 이름 변경 필요
   vpc_id = aws_vpc.public_vpc.id
-} // 기본 보안그룹 대신 해당 그룹 사용하도록 설정 해야함
+}
 
 resource "aws_security_group_rule" "test_rule_ssh" {
   type        = "ingress"
