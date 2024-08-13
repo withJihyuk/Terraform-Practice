@@ -10,7 +10,7 @@ resource "aws_vpc" "public_vpc" {
   // 가상 사설 클라우드로써 네트워크를 구성하는데 사용.
 }
 
-// 서브넷은? IP주소로써의 구분이라고 보면 되는거고, VPC 아래 여러개 있어도 된다.
+// 서브넷은? IP주소 범위로써의 구분이라고 보면 되는거고, VPC 아래 여러개 있어도 된다.
 resource "aws_subnet" "public_subnet" {
     vpc_id = aws_vpc.public_vpc.id
     cidr_block = "10.0.10.0/24" // VPC의 CIDR 범위 안에 있어야 함.
