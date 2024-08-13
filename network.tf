@@ -19,7 +19,6 @@ resource "aws_subnet" "public_subnet" {
     tags = {
         Name = "public_subnet"
     }
-  
 }
 
 resource "aws_internet_gateway" "public_igw" {
@@ -62,14 +61,14 @@ resource "aws_security_group_rule" "test_rule_ssh" {
   security_group_id = aws_security_group.test_rule.id
 }
 
-# resource "aws_security_group_rule" "test_rule_https" {
-#   type        = "ingress"
-#   from_port   = 443
-#   to_port     = 443
-#   protocol    = "tcp"
-#   cidr_blocks = ["0.0.0.0/0"]
-#   security_group_id = aws_security_group.test_rule.id
-# }
+resource "aws_security_group_rule" "test_rule_web" {
+  type        = "ingress"
+  from_port   = 8080
+  to_port     = 8080
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.test_rule.id
+}
 
 resource "aws_security_group_rule" "test_rule_all" {
   type             = "egress"
