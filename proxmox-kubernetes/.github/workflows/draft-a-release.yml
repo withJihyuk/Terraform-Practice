@@ -1,0 +1,50 @@
+name: Draft a release
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  draft-a-release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Generate the release tag
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        VERSION=$(curl -s https://raw.githubusercontent.com/khanh-ph/github-actions-scripts/master/gen-next-semver/gen-next-semver.sh | bash)
+        echo VERSION=$VERSION >> $GITHUB_ENV
+        echo BRANCH=release/$VERSION >> $GITHUB_ENV
+
+    - name: Create the release branch
+      run: |
+        git checkout -b ${{ env.BRANCH }}
+
+    - name: Push release branch
+      run: git push origin ${{ env.BRANCH }}
+
+    - name: Create a Pull Request
+      uses: actions/github-script@v6
+      env: 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const version = process.env.VERSION;
+          const title = 'Release version ' + version;
+          const body = 'Created by GitHub Actions';
+          const base = 'master';
+          const head = process.env.BRANCH;
+
+          github.rest.pulls.create({
+            owner,
+            repo,
+            title,
+            body,
+            base,
+            head
+          });

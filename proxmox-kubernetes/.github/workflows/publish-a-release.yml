@@ -1,0 +1,66 @@
+name: Publish Release to GitHub
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  publish-a-release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/')
+    steps:
+      - name: Extract version from branch name
+        run: |
+          set -x
+          branchName="${{ github.event.pull_request.head.ref }}"
+          version=${branchName#release/}
+          if [[ "$version" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-rc\.([0-9]+))?$ ]]; then
+            echo "TAG=$version" >> $GITHUB_ENV
+          else
+            echo "$version is not a supported semver." >&2
+            exit 1
+          fi 
+      
+      - name: Create Release to GitHub
+        uses: actions/github-script@v6
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const target_commitish = context.sha;
+
+            github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: process.env.TAG,
+              target_commitish,
+              name: `v${process.env.TAG}`,
+              generate_release_notes: true,
+              draft: process.env.TAG.includes('-rc'),
+              prerelease: false
+            });
+
+      - name: Create a PR to merge master back into develop branch
+        uses: actions/github-script@v6
+        env: 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const title = `Merge master into develop after publishing release ${process.env.TAG}`;
+            const body = 'Created by GitHub Actions';
+            const base = 'develop';
+            const head = 'master';
+
+            github.rest.pulls.create({
+              owner,
+              repo,
+              title,
+              body,
+              base,
+              head
+            });
