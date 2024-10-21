@@ -3,7 +3,7 @@
 # 관련 링크: https://tech.kakao.com/posts/570 
 
 # 환경 변수 참고: https://registry.terraform.io/providers/Telmate/proxmox/latest/docs
-pm_api_url          = "https://your-proxmox-url/api"
+pm_api_url          = "https://192.168.0.64:8006/api2/json/"
 pm_api_token_id     = "your-api-token-id"
 pm_api_token_secret = "your-api-token-secret"
 pm_tls_insecure     = false
