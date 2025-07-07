@@ -37,3 +37,10 @@
 | `db_password`                 | DB 관리자 비밀번호                   | `"securePW123"`                          |
 | `db_allocated_storage`        | RDS 스토리지 크기 (GB)               | `20`                                     |
 | `db_port`                     | RDS 포트                             | `3306` (MySQL)                           |
+
+## 중간 개념 정리
+
+- `NAT Gateway` vs `IGW`
+  - 공유기 같은 역할이다. 다만 `Protected Subent`이 대상이므로, 인바운드 X / 아웃바운드 O 이다.
+  - 반대 개념으론 IGW로, 직접 `Public IP`를 할당 해주는 `Internet Gateway`가 있다.
+  - `NAT Gateway`의 주 사용 예시로는, 백엔드 서버가 외부 API 통신이 필요할 때 이다.
